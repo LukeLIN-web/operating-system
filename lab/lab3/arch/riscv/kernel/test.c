@@ -33,7 +33,7 @@ void dead_loop(){
 
 void init_test_case(){
     int c_p_i = 0;
-    int flag=1;
+    int flag = 1;
     while(1){ 
         if(ticks % 10 == 5 ){
             if(flag == 1){//ticks%10与flag用于确保每个时间片只执行一次下面的代码片段

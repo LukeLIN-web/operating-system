@@ -13,7 +13,7 @@ void handler_s(uint64_t cause, uint64_t epc ){
             if(ticks%10==0){
             	do_timer();
             }
-            clock_set_next_event();
+            clock_set_next_event();// set next interrupt time
 		}
 	}
 	return;

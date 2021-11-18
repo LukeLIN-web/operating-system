@@ -86,7 +86,6 @@ __switch_to:
 	add   a3, a0, a4
 	add   a4, a1, a4
 	# Save context into prev->thread
-	/*your code*/
 	sd ra,0(a3)
 	sd sp,8(a3)
 	sd s0,16(a3)
@@ -102,7 +101,6 @@ __switch_to:
 	sd s10,96(a3)
 	sd s11,104(a3)
 	# Restore context from next->thread
-	/*your code*/
 	ld ra,0(a4)
 	ld sp,8(a4)
 	ld s0,16(a4)
