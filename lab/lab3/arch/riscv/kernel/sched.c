@@ -17,8 +17,9 @@ extern void __init_sepc(void);
 void switch_to(struct task_struct* next) {
     /*your code*/
     if(next->pid != current->pid){
+        struct task_struct* prev = current;
         current = next;
-        __switch_to(current,next);
+        __switch_to(prev,current);
     }
 }
 
@@ -48,7 +49,7 @@ void task_init(void) {
         tmp->pid = i;
         task[i] = tmp;
         task[i]->thread.sp = (unsigned long long) task[i] + TASK_SIZE; 
-        task[i]->thread.ra = __init_sepc;
+        task[i]->thread.ra = &__init_sepc;
         printf("[PID = %d] Process Create Successfully!\n", task[i]->pid);
     }
     task_init_done = 1;
@@ -63,30 +64,29 @@ void do_timer(void) {
     printf("[*PID = %d] Context Calculation: counter = %d,priority = %d\n", current->pid, current->counter,current->priority);
     //current process's counter -1, judge whether to schedule or go on.
     /*your code*/
+    current->counter --;
     if(current->counter == 0)
         schedule();
-    current->counter --;
 }
 
 //Select the next task to run. If all tasks are done(counter=0), set task0's counter to 1 and it would 
 //assign new test case.
 void schedule(void) {
-    unsigned char next = LAB_TEST_NUM; 
-    /*your code*/
-    int i;
-    long c = task[LAB_TEST_NUM]->counter;
-    for(i = LAB_TEST_NUM-1;i >=1;i --){
-        c += task[i]->counter;
-        if(task[i]->counter < task[next]->counter){
+    int next = -1; 
+    long  min = 999;
+    for(int i = LAB_TEST_NUM ;i >= 1;i --){
+        if(task[i]->counter == 0)
+            continue;
+        if(task[i]->counter < min){
             next = i;
+            min = task[next]->counter;
         }
     }
-    if(c == 0){
+    if(next == -1){
+        next = 0;
         task[0]->counter = 1;
-        init_test_case();
     }
-
-    if(current->pid != task[next]->pid){
+    if(next != -1 && current->pid != task[next]->pid){
         printf("[ %d -> %d ] Switch from task %d[%lx] to task %d[%lx], prio: %d, counter: %d\n", 
         current->pid,task[next]->pid,
         current->pid, (unsigned long)current->thread.sp, 
@@ -107,43 +107,46 @@ void do_timer(void) {
     printf("[*PID = %d] Context Calculation: counter = %d,priority = %d\n", current->pid, current->counter,current->priority);
     //current process's counter -1, judge whether to schedule or go on.
     /*your code*/
-    if(current->counter-- == 0){
+    current->counter --;
+    if(current->counter == 0)
         schedule();
-    }
-    else{
-        return;
-    }
 }
 
 //Select the next task to run. If all tasks are done(counter=0), set task0's counter to 1 and it would 
 //assign new test case.
 void schedule(void) {
-    unsigned char next; 
+    unsigned char next = -1; 
     /*your code*/
-    int maxPriority = task[LAB_TEST_NUM]->priority ;
-    int remainShortest = task[LAB_TEST_NUM]->counter;
+    int maxPriority = -1;
+    int remainShortest = 999;
     char flag = 2 ;
-    for (int i = LAB_TEST_NUM-1; i >= 1; i--){
+    for (int i = LAB_TEST_NUM; i >= 1; i--){
         /* code */
+        if(task[i]->counter <= 0)
+            continue;
         if( task[i]->priority > maxPriority ){
             next = i ; 
+            maxPriority = task[i]->priority;
+            // remainShortest = task[i]->counter;
         }
-        if ( task[i]->priority == maxPriority){
-            if( task[i]->counter < remainShortest  ){
-                next = i ;// if they have equal priority, don't change 'next' since we select by iteration order.
+        else{
+            if ( task[i]->priority == maxPriority){
+                if( task[i]->counter < remainShortest ){
+                    next = i ;// if they have equal priority, don't change 'next' since we select by iteration order.
+                    remainShortest = task[i]->counter;
+                }
             }
         }
-        if (task[i]->counter > 0 ){
+        if (task[i]->counter > 0)
             flag = 1;
-        }
     }
-    if (flag == 2){
+    if (flag == 2  ){
         // allocate a time slice to task0
         task[0]->counter = 1;
-        init_test_case();// I wonder whether we can call it directly, we do not declare it ?
+        //init_test_case();// I wonder whether we can call it directly, we do not declare it ?
+        next = 0;
     }
-    if(current->pid != task[next]->pid)
-    {
+    if(current->pid != task[next]->pid){
         printf("[ %d -> %d ] Switch from task %d[%lx] to task %d[%lx], prio: %d, counter: %d\n", 
         current->pid,task[next]->pid,
         current->pid, (unsigned long)current->thread.sp, 
