@@ -20,4 +20,4 @@ void paging_init()
     create_mapping(,  (uint64_t)&rodata_start,,,2);
     create_mapping(,  (uint64_t)&data_start,,,7);
 
-}
+} 

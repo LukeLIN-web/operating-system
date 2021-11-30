@@ -18,8 +18,6 @@
 .extern paging_init
 .extern init_stack_top
 
-
-
 _start:
 	#关闭所有中断
 	li t1, 0x8               #t1=1000
@@ -31,7 +29,7 @@ _start:
 	la t1, _mtrap            # t1=&_mtrap
 	csrw mtvec, t1           
 
-	#设置mscratch
+	# 设置mscratch 保存M mode下上下文物理空间的地址
 	la t1, stack_top
 	csrw mscratch, t1
 
@@ -84,20 +82,52 @@ _supervisor:
 	csrrw x0, satp, x0   # 设置`satp`寄存器为0，暂时关闭MMU
 	#  设置`stvec`为异常处理函数`trap_s`在**虚拟地址空间下**的地址
 	la t1, trap_s            # t1=&_mtrap
+	addi t2,x0, 8
+	slli t2, 7
+	sub t1,t1,t2 # -0x8000 0000
+	addi t2,x0,0xfff
+	slli t2,3
+	addi t2,t2,0xfff
+	slli t2,3
+	addi t2,t2,0xe
+	slli t2,9
+	add t1,t2,t1 # +0xffff ffe0 0000 0000
 	csrw stvec, t1           
-	andi sp,x0 # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
-	la t1, stack_top
-	add sp, t1
+	# 记录`start_kernel`在**虚拟地址空间下**的地址，加载到寄存器中
+	la t1, start_kernel
+	addi t2,x0, 8
+	slli t2, 7
+	sub t1,t1,t2 # -0x8000 0000
+	addi t2,x0,0xfff
+	slli t2,3
+	addi t2,t2,0xfff
+	slli t2,3
+	addi t2,t2,0xe
+	slli t2,9
+	add x3,t2,t1 # +0xffff ffe0 0000 0000
+	addi sp,x0,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
 	call paging_init  # 调用`paging_init`函数进行映射
+	# 设置`satp`的值以打开MMU
 
+	# 执行`sfence.vma`指令同步虚拟内存相关映射
 
+	# 设置`sp`的值为虚拟地址空间下的`init_stack_top`
+	la t1, init_stack_top
+	addi t2,x0, 8
+	slli t2, 7
+	sub t1,t1,t2 # -0x8000 0000
+	addi t2,x0,0xfff
+	slli t2,3
+	addi t2,t2,0xfff
+	slli t2,3
+	addi t2,t2,0xe
+	slli t2,9
+	add t1,t2,t1 # +0xffff ffe0 0000 0000
+	jr x3 #  jalr rd,rs1,offset ,  Jump to address and place return address in rd x4.
 	
-
-
-
 	
 _mtrap:
-	# 交换mscratch和sp
+	# 交换mscratch和sp, 使用上下文空间作为`trap_m`的栈并保存`x1-x31`寄存器。
 	csrrw sp,mscratch,sp
 
 	# 保存寄存器
@@ -238,6 +268,6 @@ exit:
     ld ra, 248(sp)
 	ld sp, 256(sp)
 
-	#交换mscratch和sp
+	# 在`trap_m`返回前将`mscratch`与`sp`寄存器的值重新交换回来。
 	csrrw sp,mscratch,sp
 	mret

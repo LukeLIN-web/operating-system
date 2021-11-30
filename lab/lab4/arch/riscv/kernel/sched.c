@@ -5,7 +5,7 @@
 struct task_struct *current;
 struct task_struct *task[NR_TASKS];
 long PRIORITY_INIT_COUNTER[NR_TASKS] = {0,1,2,3,4};
-long COUNTER_INIT_COUNTER[NR_TASKS] = {0,1,2,3,4};
+long COUNTER_INIT_COUNTER[NR_TASKS] = {0,4,3,2,1};
 
 extern void init_epc(void);
 extern void __switch_to(struct task_struct* current, struct task_struct* next);
