@@ -47,7 +47,7 @@ clean_loop:
 	li t1, 0x200bff8         #t1=mtime的地址
 	li t2, 0x2004000         #t2=mtimecmp的地址
 	ld t4, 0(t1)             #读mtime的8字节的内容到t4中
-	li t3, 100000000         # 控制时间  原来的值是 1000 000
+	li t3, 10000000000         # 控制时间  原来的值是 1000 000
 	add t4, t4, t3           # t4加上1000000
 	sd t4, 0(t2)             # 将a0的值存入地址为t2的内存中（8字节）
 
@@ -98,9 +98,10 @@ _supervisor:
 	la sp,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
 	call paging_init  # 调用`paging_init`函数进行映射
 	# 设置`satp`的值以打开MMU
-	li t2, 8
+	li t2, 1
 	slli t2,t2,63
 	la t1, _end
+	srli t1,t1,12
 	add t1,t2,t1 
 	csrw satp, t1 
 	# 执行`sfence.vma`指令同步虚拟内存相关映射

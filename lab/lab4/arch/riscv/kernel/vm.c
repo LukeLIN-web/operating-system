@@ -20,19 +20,22 @@ void create_mapping(uint64_t *pgtbl, uint64_t va, uint64_t pa, uint64_t sz, int 
         uint64_t *pgtbl_1;
         uint64_t *pgtbl_0;
         PPN = ((pa + i * page_size)&(0x7fff<<12))>>12;
-        VPN[2] = ((va + i * page_size)&(0x1ff<<30))>>30;
-        VPN[1] = ((va + i * page_size)&(0x1ff<<21))>>21;
-        VPN[0] = ((va + i * page_size)&(0x1ff<<12))>>12;
-        puts("1");
+        VPN[2] = ((va + i * page_size) >>30)&0x1ff;
+        VPN[1] = ((va + i * page_size)>>21)&0x1ff;
+        VPN[0] = ((va + i * page_size)>>12)&0x1ff;
+        // puts("VPN[0]\n");
+        // putullHex(VPN[0]);
+        // puts("VPN[1]\n");
+        // putullHex(VPN[1]);
+        // puts("1");
+        // putullHex(VPN[2]);
 
         if(!pgtbl[VPN[2]]){
             puts("new entry");
-            pgtbl_1 = &_end + 0x1000 * page_count;
-            puts("new entry");
+            pgtbl_1 =(uint64_t *)  ( &_end + 0x1000 * page_count);
             page_count ++;
-            puts("new entry");
             // Page_table_entry[2] = (0x1ffffff<<39) + ((uint64_t)pgtbl_1<<10) + (perm<<1) + valid;
-            puti(page_count);
+            // puti(page_count);
             Page_table_entry[2] = (((uint64_t)pgtbl_1>>12)<<10)  + valid;
             pgtbl[VPN[2]] = Page_table_entry[2];
         }
@@ -40,22 +43,22 @@ void create_mapping(uint64_t *pgtbl, uint64_t va, uint64_t pa, uint64_t sz, int 
             puts("exist entry");
             pgtbl_1 = (pgtbl[VPN[2]]>>10) << page_offset;
         }
-        puts("2");
+        // puts("2");
 
         if(!pgtbl_1[VPN[1]]){
             pgtbl_0 = &_end + 0x1000 * page_count;
             // pgtbl_0 = 0x8000000 + 0x1000 * page_count;
             page_count ++; // page count 或许不能全局变量.
             //Page_table_entry[1] = ((uint64_t)0x1ffffff<<39) + (((uint64_t)pgtbl_1>>12)<<10)  + valid;
-            Page_table_entry[1] =  (((uint64_t)pgtbl_1>>12)<<10)  + valid;
-            pgtbl_1[ VPN[1]] = Page_table_entry[1];
+            Page_table_entry[1] =  (((uint64_t)pgtbl_0>>12)<<10)  + valid;
+            pgtbl_1[VPN[1]] = Page_table_entry[1];
         }
         else{
             pgtbl_0 = (pgtbl[VPN[1]]>>10) << page_offset;
         }
-        puts("3");
+        // puts("3");
         //Page_table_entry[0] = ((uint64_t)0x1ffffff<<39) + ((PPN>>12)<<10) + (perm<<1) + valid;  
-        Page_table_entry[0] = ((PPN>>12)<<10) + (perm<<1) + valid;
+        Page_table_entry[0] = ((pa>>12)<<10) + (perm<<1) + valid;
         pgtbl_0[ VPN[0]] = Page_table_entry[0];
     }
 	/*your code*/
@@ -65,7 +68,7 @@ void paging_init()
 {
    uint64_t *pgtbl = &_end;
    create_mapping(pgtbl,0xffffffe000000000,0x8000000,0x1000000,7);
-   puts("finished create mapping first");
+   puts("finished create mapping first\n");
    create_mapping(pgtbl,0x8000000,0x8000000,0x1000000,7);
    puts("finished create mapping second");
    create_mapping(pgtbl,0x1000000,0x1000000,page_size,7);
