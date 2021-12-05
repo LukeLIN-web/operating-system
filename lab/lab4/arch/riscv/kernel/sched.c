@@ -12,8 +12,7 @@ extern void __switch_to(struct task_struct *current, struct task_struct *next);
 extern unsigned int rand();
 extern uint64_t cur;
 
-void task_init(void)
-{
+void task_init(void){
     puts("task init...\n");
 
     //initialize task[0]
