@@ -12,7 +12,8 @@ extern void __switch_to(struct task_struct *current, struct task_struct *next);
 extern unsigned int rand();
 extern uint64_t cur;
 
-void task_init(void){
+void task_init(void)
+{
     puts("task init...\n");
 
     //initialize task[0]
@@ -26,7 +27,8 @@ void task_init(void){
     task[0]->thread.sp = (unsigned long long)task[0] + TASK_SIZE;
 
     //set other 4 tasks
-    for (int i = 1; i <= LAB_TEST_NUM; ++i){
+    for (int i = 1; i <= LAB_TEST_NUM; ++i)
+    {
         struct task_struct *tmp = (struct task_struct *)(0xffffffe000210000 + PAGE_SIZE * i);
         tmp->state = TASK_RUNNING;
         tmp->counter = COUNTER_INIT_COUNTER[i];
@@ -55,14 +57,14 @@ void do_timer(void)
     current->counter--;
     if (current->counter == 0)
         schedule();
-    
 }
 
 void schedule(void)
 {
     int next = -1;
     long min = 999;
-    for (int i = LAB_TEST_NUM; i >= 1; i--){
+    for (int i = LAB_TEST_NUM; i >= 1; i--)
+    {
         if (task[i]->counter == 0)
         {
             continue;
@@ -73,7 +75,8 @@ void schedule(void)
             min = task[i]->counter;
         }
     }
-    if (next == -1){
+    if (next == -1)
+    {
         int tmp = LAB_TEST_NUM;
         while (tmp >= 1)
         {
@@ -82,7 +85,8 @@ void schedule(void)
         }
         schedule();
     }
-    if (next != -1 && current->pid != task[next]->pid){
+    if (next != -1 && current->pid != task[next]->pid)
+    {
         puts("[!] Switch from task ");
         puti(current->pid);
         puts(" [task struct: ");

@@ -19,11 +19,11 @@
 .extern init_stack_top
 
 _start:
-	#关闭所有中断
-	li t1, 0x8               #t1=1000
-	csrc mstatus, t1         #将mstatus寄存器的第三位置0（1的对应位清零）
-	li t1, 0x888             #t1=1000 1000 1000
-	csrc mie, t1             #将mie寄存器的第11、7、3位置0（1的对应位清零）
+	# 关闭所有中断
+	li t1, 0x8               # t1=1000
+	csrc mstatus, t1         # 将mstatus寄存器的第三位置0（1的对应位清零）
+	li t1, 0x888             # t1=1000 1000 1000
+	csrc mie, t1             # 将mie寄存器的第11、7、3位置0（1的对应位清零）
 
 	# 设置M异常地址
 	la t1, _mtrap            # t1=&_mtrap
@@ -33,10 +33,10 @@ _start:
 	la t1, stack_top
 	csrw mscratch, t1
 
-	#初始化.bss
-	la t1, bss_start         #t1=bss段start的地址
-	la t2, bss_end           #t2=bss段end的地址
-	li t3, 0x0               #填入的内容
+	# 初始化.bss
+	la t1, bss_start         # t1=bss段start的地址
+	la t2, bss_end           # t2=bss段end的地址
+	li t3, 0x0               # 填入的内容
 
 clean_loop:
 	sb t3, 0(t1)             #往t1的内存中写入t3的内容（每次1个字节）
@@ -47,12 +47,12 @@ clean_loop:
 	li t1, 0x200bff8         #t1=mtime的地址
 	li t2, 0x2004000         #t2=mtimecmp的地址
 	ld t4, 0(t1)             #读mtime的8字节的内容到t4中
-	li t3, 1000000
-	add t4, t4, t3           #t4加上1000000
-	sd t4, 0(t2)             #将a0的值存入地址为t2的内存中（8字节）
+	li t3, 100000000         # 控制时间  原来的值是 1000 000
+	add t4, t4, t3           # t4加上1000000
+	sd t4, 0(t2)             # 将a0的值存入地址为t2的内存中（8字节）
 
 	# 设置时钟中断委托
-	li t1, 0x20              #10 0000     mideleg的第5位置1
+	li t1, 0x20              # 10 0000     mideleg的第5位置1
 	csrs mideleg, t1
 
 	# 设置instruction/load/store page fault委托
@@ -94,7 +94,7 @@ _supervisor:
 	sub t1,t1,t2 # -0x8000 0000
 	li t2,0xffffffe
 	slli t2,t2,36
-	add x3,t2,t1 # +0xffff ffe0 0000 0000
+	add t3,t2,t1 # +0xffff ffe0 0000 0000
 	la sp,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
 	call paging_init  # 调用`paging_init`函数进行映射
 	# 设置`satp`的值以打开MMU
@@ -112,7 +112,7 @@ _supervisor:
 	li t2,0xffffffe
 	slli t2,t2,36
 	add x3,t2,t1 # +0xffff ffe0 0000 0000
-	jr x3 #  jalr rd,rs1,offset ,  Jump to address and place return address in rd x4.
+	jr t3 #  jalr rd,rs1,offset ,  Jump to address and place return address in rd x4.
 	
 _mtrap:
 	# 交换mscratch和sp, 使用上下文空间作为`trap_m`的栈并保存`x1-x31`寄存器。
@@ -175,15 +175,15 @@ is_int:
 
 
 time_interupt:
-	#禁用时钟中断
+	# 禁用时钟中断
 	li t1, 0x80              #1000 0000
 	csrc mie, t1             #对应位清0
 
-	#设置stip为1
+	# 设置stip为1
 	li t1, 0x20              #10 0000
 	csrs mip, t1           
 
-	#恢复寄存器mepc和mstatus
+	# 恢复寄存器mepc和mstatus
 	ld t0, 0(sp)
 	ld t1, 8(sp)
     csrw mepc, t0 	         #恢复寄存器mepc
@@ -191,22 +191,22 @@ time_interupt:
 	j exit
 
 encall_from_s:
-	#mtimecmp+=fff000
+	# mtimecmp+=fff000
 	li t1, 0x2004000         #t1=mtimecmp的地址
 	ld t0, 0(t1)             #读mtime的8字节的内容到t0中
 	li t3, 0xfff000
 	add t0, t0, t3           #a0加上fff000
 	sd t0, 0(t1)             #将t0的值存入地址为t1的内存中（8字节）
 
-	#清stip
+	# 清stip
 	li t1, 0x20              #10 0000
 	csrc mip, t1
 
-	#使能时钟中断
+	# 使能时钟中断
 	li t1, 0x80              #1000 0000
 	csrs mie, t1             #对应位置1
 
-	#恢复寄存器mepc和mstatus
+	# 恢复寄存器mepc和mstatus
 	ld t0, 0(sp)
 	addi t0, t0, 4           #mepc+4
 	ld t1, 8(sp)
@@ -216,7 +216,7 @@ encall_from_s:
 
 
 other_trap:
-	#恢复寄存器mepc和mstatus
+	# 恢复寄存器mepc和mstatus
 	ld t0, 0(sp)
 	ld t1, 8(sp)
     csrw mepc, t0 	         #恢复寄存器mepc
