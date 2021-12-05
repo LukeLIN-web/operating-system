@@ -43,7 +43,7 @@ clean_loop:
 	addi t1, t1, 1           #t1的值往后1个字节
 	bne t1, t2, clean_loop   #比较，如果t1和t2的值不等，则继续往内存中存t3的内容
 
-	#初始化mtimecmp寄存器
+	# 初始化mtimecmp寄存器
 	li t1, 0x200bff8         #t1=mtime的地址
 	li t2, 0x2004000         #t2=mtimecmp的地址
 	ld t4, 0(t1)             #读mtime的8字节的内容到t4中
@@ -51,11 +51,11 @@ clean_loop:
 	add t4, t4, t3           #t4加上1000000
 	sd t4, 0(t2)             #将a0的值存入地址为t2的内存中（8字节）
 
-	#设置时钟中断委托
+	# 设置时钟中断委托
 	li t1, 0x20              #10 0000     mideleg的第5位置1
 	csrs mideleg, t1
 
-	#设置instruction/load/store page fault委托
+	# 设置instruction/load/store page fault委托
 	li t1, 0xB
 	slli t1, t1, 12				#t1=1011 0000 0000 0000
 	csrs medeleg, t1
@@ -65,13 +65,13 @@ clean_loop:
 	li t1, 0x0a0             #1010 0000   mie的第7、5位置1   mtie && stie
 	csrs mie, t1
 
-	#切换模式
+	# 切换模式
 	li t1, 0x800             #t1=1000 0000 0000  supervisor mode = 01
 	csrs mstatus, t1         #将mstatus第11位置1
 	li t1, 0x1000            #t1=0001 0000 0000 
 	csrc mstatus, t1         #将mstatus第12位清0
 
-	#切换模式
+	# 切换模式
 	la t1, _supervisor       # t1=_supervisor
 	csrw mepc, t1            # 将t1的值写入mepc（出现异常的返回地址，用mret必须要有的）
 	mret                     
@@ -81,50 +81,38 @@ _supervisor:
 	li t0,0x0
 	csrrw x0, satp, x0   # 设置`satp`寄存器为0，暂时关闭MMU
 	#  设置`stvec`为异常处理函数`trap_s`在**虚拟地址空间下**的地址
-	la t1, trap_s            # t1=&_mtrap
-	addi t2,x0, 8
-	slli t2, 7
+	la t1, trap_s         # t1=&_mtrap
+	li t2,0x80000000
 	sub t1,t1,t2 # -0x8000 0000
-	addi t2,x0,0xfff
-	slli t2,3
-	addi t2,t2,0xfff
-	slli t2,3
-	addi t2,t2,0xe
-	slli t2,9
+	li t2,0xffffffe
+	slli t2,t2,36
 	add t1,t2,t1 # +0xffff ffe0 0000 0000
 	csrw stvec, t1           
 	# 记录`start_kernel`在**虚拟地址空间下**的地址，加载到寄存器中
 	la t1, start_kernel
-	addi t2,x0, 8
-	slli t2, 7
+	li t2,0x80000000
 	sub t1,t1,t2 # -0x8000 0000
-	addi t2,x0,0xfff
-	slli t2,3
-	addi t2,t2,0xfff
-	slli t2,3
-	addi t2,t2,0xe
-	slli t2,9
+	li t2,0xffffffe
+	slli t2,t2,36
 	add x3,t2,t1 # +0xffff ffe0 0000 0000
-	addi sp,x0,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
+	la sp,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
 	call paging_init  # 调用`paging_init`函数进行映射
 	# 设置`satp`的值以打开MMU
-
+	li t2, 8
+	slli t2,t2,63
+	la t1, _end
+	add t1,t2,t1 
+	csrw satp, t1 
 	# 执行`sfence.vma`指令同步虚拟内存相关映射
-
+	sfence.vma
 	# 设置`sp`的值为虚拟地址空间下的`init_stack_top`
 	la t1, init_stack_top
-	addi t2,x0, 8
-	slli t2, 7
+	li t2,0x80000000
 	sub t1,t1,t2 # -0x8000 0000
-	addi t2,x0,0xfff
-	slli t2,3
-	addi t2,t2,0xfff
-	slli t2,3
-	addi t2,t2,0xe
-	slli t2,9
-	add t1,t2,t1 # +0xffff ffe0 0000 0000
+	li t2,0xffffffe
+	slli t2,t2,36
+	add x3,t2,t1 # +0xffff ffe0 0000 0000
 	jr x3 #  jalr rd,rs1,offset ,  Jump to address and place return address in rd x4.
-	
 	
 _mtrap:
 	# 交换mscratch和sp, 使用上下文空间作为`trap_m`的栈并保存`x1-x31`寄存器。

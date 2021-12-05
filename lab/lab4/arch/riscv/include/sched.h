@@ -3,6 +3,7 @@
 
 #define uint64_t unsigned long long
 
+#define PAGE_SIZE  (4096)
 #define TASK_SIZE   (4096)
 #define THREAD_OFFSET  (5 * 0x08)
 
