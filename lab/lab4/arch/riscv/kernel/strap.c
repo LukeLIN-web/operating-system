@@ -10,5 +10,12 @@ void handler_s(uint64_t cause){
 			count++;
 		}
 	}
-	return;
+	else{
+		if(cause == 0xd)
+            puts(" load page fault!\n");
+		else if(cause == 0xf)
+            puts(" store page fault!\n");
+        else if(cause == 0xc)
+            puts(" instruction page fault!\n");
+	}
 }

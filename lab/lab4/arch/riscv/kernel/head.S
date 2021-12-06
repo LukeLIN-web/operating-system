@@ -33,6 +33,10 @@ _start:
 	la t1, stack_top
 	csrw mscratch, t1
 
+	# 设置
+	li t1, 0xb000
+    csrs medeleg,t1
+
 	# 初始化.bss
 	la t1, bss_start         # t1=bss段start的地址
 	la t2, bss_end           # t2=bss段end的地址
@@ -80,28 +84,32 @@ _supervisor:
 	/*your code*/
 	li t0,0
 	csrw  satp, t0   # 设置`satp`寄存器为0，暂时关闭MMU
-	li s1,0xFFFFFFE000000000
+	li s1,0xffffffe000000000
 	li t2,0x80000000
-	sub s1,s1,t2 # -0x8000 0000 # offset store in t3 #  设置`stvec`为异常处理函数`trap_s`在**虚拟地址空间下**的地址
+	sub s1,s1,t2 # -0x8000 0000 
+	# offset store in t3 
+	#  设置`stvec`为异常处理函数`trap_s`在**虚拟地址空间下**的地址
 	la t1, trap_s         
 	add t1,t1,s1
-	csrw stvec, t1           # 记录`start_kernel`在**虚拟地址空间下**的地址，加载到寄存器t4中
+	csrw stvec, t1           
+	# 记录`start_kernel`在**虚拟地址空间下**的地址，加载到寄存器t4中
 	la t1, start_kernel
 	add s4, s1,t1 
-	la sp,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
-	call paging_init  # 调用`paging_init`函数进行映射 # 设置`satp`的值以打开MMU
+	la sp,stack_top 
+	# 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
+	call paging_init  
+	# 调用`paging_init`函数进行映射 # 设置`satp`的值以打开MMU
 	li t2, 1
 	slli t2,t2,63
 	la s3, _end
 	srli s3, s3, 12
-	# or t1,t2,s3 
-	add t1,s3,t2  # 可能需要 or
-	csrw satp, t1  # 执行`sfence.vma`指令同步虚拟内存相关映射
-	sfence.vma  x0, x0 # 设置`sp`的值为虚拟地址空间下的`init_stack_top`
-
+	add t1,s3,t2  
+	csrw satp, t1  
+	# 执行`sfence.vma`指令同步虚拟内存相关映射
+	sfence.vma 
+	# 设置`sp`的值为虚拟地址空间下的`init_stack_top`
 	la sp, init_stack_top
 	add sp, sp, s1
-
 	jr s4 #  jalr rd,rs1,offset ,  Jump to address and place return address in rd x4.
 	
 _mtrap:
