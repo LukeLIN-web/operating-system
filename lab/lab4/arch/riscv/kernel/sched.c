@@ -11,7 +11,6 @@ extern void init_epc(void);
 extern void __switch_to(struct task_struct *current, struct task_struct *next);
 extern unsigned int rand();
 extern uint64_t cur;
-const int test ;
 
 void task_init(void)
 {
@@ -26,20 +25,6 @@ void task_init(void)
     current->pid = 0;
     task[0] = current;
     task[0]->thread.sp = (unsigned long long)task[0] + TASK_SIZE;
-    __asm__ __volatile__ ("movl $0, %%eax;\n\t
-
-　　　　　　　　　　　　movl %%eax, %1;\n\t
-
-　　　　　　　　　　　　movl %2, %%eax;\n\t
-
-　　　　　　　　　　　　movl %%eax, %0;\n\t"
-
-　　　　　　　　　　　　:"=m"(output),"=m"(temp) /* output */
-
-　　　　　　　　　　　　:"r"(input) /* input */
-
-　　　　　　　　　　　　);
-
     //set other 4 tasks
     for (int i = 1; i <= LAB_TEST_NUM; ++i)
     {
