@@ -26,8 +26,7 @@ void task_init(void){
     task[0]->thread.sp = (unsigned long long)task[0] + TASK_SIZE;
 
     //set other 4 tasks
-    for (int i = 1; i <= LAB_TEST_NUM; ++i)
-    {
+    for (int i = 1; i <= LAB_TEST_NUM; ++i){
         struct task_struct *tmp = (struct task_struct *)(0xffffffe000210000 + PAGE_SIZE * i);
         tmp->state = TASK_RUNNING;
         tmp->counter = COUNTER_INIT_COUNTER[i];
@@ -117,8 +116,7 @@ void switch_to(struct task_struct *next)
     }
 }
 
-void dead_loop(void)
-{
+void dead_loop(void){
     while (1)
     {
         continue;
