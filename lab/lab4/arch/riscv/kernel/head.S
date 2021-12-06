@@ -78,43 +78,35 @@ clean_loop:
 
 _supervisor:
 	/*your code*/
-	li t0,0x0
-	csrw  satp, t0   # 设置`satp`寄存器为0，暂时关闭MMU
-	#  设置`stvec`为异常处理函数`trap_s`在**虚拟地址空间下**的地址
-	la t1, trap_s         # t1=&_mtrap
-	li t2,0xffffffe
-	slli t2,t2,36
-	add t1,t2,t1 # +0xffff ffe0 0000 0000
-	li t2,0x80000000
-	sub t1,t1,t2 # -0x8000 0000
-	csrw stvec, t1           
-	# 记录`start_kernel`在**虚拟地址空间下**的地址，加载到寄存器t3中
-	la t1, start_kernel
-	li t2,0xffffffe
-	slli t2,t2,36
-	add t1,t2,t1 # +0xffff ffe0 0000 0000
-	li t2,0x80000000
-	sub t3,t1,t2 # -0x8000 0000
-	la sp,stack_top # 设置`sp`的值为`stack_top`的物理地址（设置低地址空间栈环境）
-	call paging_init  # 调用`paging_init`函数进行映射
-	# 设置`satp`的值以打开MMU
-	li t2, 1
-	slli t2,t2,63
-	la t1, _end
-	srli t1,t1,12
-	add t1,t2,t1 
-	csrw satp, t1 
-	# 执行`sfence.vma`指令同步虚拟内存相关映射
-	sfence.vma
-	# 设置`sp`的值为虚拟地址空间下的`init_stack_top`
-	la t1, init_stack_top
-	li t2,0xffffffe
-	slli t2,t2,36
-	add t1,t2,t1 # +0xffff ffe0 0000 0000
-	li t2,0x80000000
-	sub sp,t1,t2 # -0x8000 0000
-	jr t3 #  jalr rd,rs1,offset ,  Jump to address and place return address in rd x4.
+	li s1, 0
+	csrw satp, s1
 	
+	li s1, 0xFFFFFFE000000000
+	li s2, 0x80000000
+	sub s1, s1, s2
+	la s2, trap_s
+	add s2, s1, s2
+	csrw stvec, s2
+	
+	la s4, start_kernel
+	add s4, s1, s4
+	
+	la sp, stack_top
+	
+	call paging_init
+	
+	addi s2, x0, 1
+	slli s2, s2, 63
+	la s3, _end
+	srli s3, s3, 12
+	or s2, s2, s3
+	csrw satp, s2
+	sfence.vma x0, x0
+	
+	la sp, init_stack_top
+	add sp, sp, s1
+	
+	jr s4
 _mtrap:
 	# 交换mscratch和sp, 使用上下文空间作为`trap_m`的栈并保存`x1-x31`寄存器。
 	csrrw sp,mscratch,sp
