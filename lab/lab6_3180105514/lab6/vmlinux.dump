@@ -498,7 +498,7 @@ ffffffe000000704:	00e79a63          	bne	a5,a4,ffffffe000000718 <handler_s+0x9c>
 ffffffe000000708:	554020ef          	jal	ra,ffffffe000002c5c <fork>
 ffffffe00000070c:	04a43423          	sd	a0,72(s0)
 ffffffe000000710:	0080006f          	j	ffffffe000000718 <handler_s+0x9c>
-ffffffe000000714:	10d020ef          	jal	ra,ffffffe000003020 <do_page_fault>
+ffffffe000000714:	10d020ef          	jal	ra,ffffffe000003020 <>
 ffffffe000000718:	00813083          	ld	ra,8(sp)
 ffffffe00000071c:	00013403          	ld	s0,0(sp)
 ffffffe000000720:	01010113          	addi	sp,sp,16
@@ -3216,7 +3216,7 @@ ffffffe000003014:	00813983          	ld	s3,8(sp)
 ffffffe000003018:	03010113          	addi	sp,sp,48
 ffffffe00000301c:	00008067          	ret
 
-ffffffe000003020 <do_page_fault>:
+ffffffe000003020 <>:
 ffffffe000003020:	fd010113          	addi	sp,sp,-48
 ffffffe000003024:	02113423          	sd	ra,40(sp)
 ffffffe000003028:	02813023          	sd	s0,32(sp)
@@ -3255,33 +3255,33 @@ ffffffe0000030a8:	1e8000ef          	jal	ra,ffffffe000003290 <puts>
 ffffffe0000030ac:	00043783          	ld	a5,0(s0)
 ffffffe0000030b0:	0b07b503          	ld	a0,176(a5)
 ffffffe0000030b4:	02853403          	ld	s0,40(a0)
-ffffffe0000030b8:	00041e63          	bnez	s0,ffffffe0000030d4 <do_page_fault+0xb4>
+ffffffe0000030b8:	00041e63          	bnez	s0,ffffffe0000030d4 <+0xb4>
 ffffffe0000030bc:	00001517          	auipc	a0,0x1
 ffffffe0000030c0:	31450513          	addi	a0,a0,788 # ffffffe0000043d0 <kmem_cache_objsize+0x108>
 ffffffe0000030c4:	1cc000ef          	jal	ra,ffffffe000003290 <puts>
-ffffffe0000030c8:	0f80006f          	j	ffffffe0000031c0 <do_page_fault+0x1a0>
+ffffffe0000030c8:	0f80006f          	j	ffffffe0000031c0 <+0x1a0>
 ffffffe0000030cc:	01043403          	ld	s0,16(s0)
-ffffffe0000030d0:	1a040863          	beqz	s0,ffffffe000003280 <do_page_fault+0x260>
+ffffffe0000030d0:	1a040863          	beqz	s0,ffffffe000003280 <+0x260>
 ffffffe0000030d4:	00043583          	ld	a1,0(s0)
-ffffffe0000030d8:	feb4eae3          	bltu	s1,a1,ffffffe0000030cc <do_page_fault+0xac>
+ffffffe0000030d8:	feb4eae3          	bltu	s1,a1,ffffffe0000030cc <+0xac>
 ffffffe0000030dc:	00843783          	ld	a5,8(s0)
-ffffffe0000030e0:	fef4f6e3          	bgeu	s1,a5,ffffffe0000030cc <do_page_fault+0xac>
+ffffffe0000030e0:	fef4f6e3          	bgeu	s1,a5,ffffffe0000030cc <+0xac>
 ffffffe0000030e4:	00c00713          	li	a4,12
-ffffffe0000030e8:	02e90863          	beq	s2,a4,ffffffe000003118 <do_page_fault+0xf8>
+ffffffe0000030e8:	02e90863          	beq	s2,a4,ffffffe000003118 <+0xf8>
 ffffffe0000030ec:	00d00713          	li	a4,13
-ffffffe0000030f0:	0ee90e63          	beq	s2,a4,ffffffe0000031ec <do_page_fault+0x1cc>
+ffffffe0000030f0:	0ee90e63          	beq	s2,a4,ffffffe0000031ec <+0x1cc>
 ffffffe0000030f4:	00f00713          	li	a4,15
-ffffffe0000030f8:	02e91663          	bne	s2,a4,ffffffe000003124 <do_page_fault+0x104>
+ffffffe0000030f8:	02e91663          	bne	s2,a4,ffffffe000003124 <+0x104>
 ffffffe0000030fc:	03043703          	ld	a4,48(s0)
 ffffffe000003100:	00377713          	andi	a4,a4,3
-ffffffe000003104:	02071063          	bnez	a4,ffffffe000003124 <do_page_fault+0x104>
+ffffffe000003104:	02071063          	bnez	a4,ffffffe000003124 <+0x104>
 ffffffe000003108:	00001517          	auipc	a0,0x1
 ffffffe00000310c:	2e850513          	addi	a0,a0,744 # ffffffe0000043f0 <kmem_cache_objsize+0x128>
 ffffffe000003110:	180000ef          	jal	ra,ffffffe000003290 <puts>
-ffffffe000003114:	0ac0006f          	j	ffffffe0000031c0 <do_page_fault+0x1a0>
+ffffffe000003114:	0ac0006f          	j	ffffffe0000031c0 <+0x1a0>
 ffffffe000003118:	03043703          	ld	a4,48(s0)
 ffffffe00000311c:	00777713          	andi	a4,a4,7
-ffffffe000003120:	0a070e63          	beqz	a4,ffffffe0000031dc <do_page_fault+0x1bc>
+ffffffe000003120:	0a070e63          	beqz	a4,ffffffe0000031dc <+0x1bc>
 ffffffe000003124:	000014b7          	lui	s1,0x1
 ffffffe000003128:	fff48493          	addi	s1,s1,-1 # fff <_start-0xffffffdffffff001>
 ffffffe00000312c:	009784b3          	add	s1,a5,s1
@@ -3289,11 +3289,11 @@ ffffffe000003130:	40b484b3          	sub	s1,s1,a1
 ffffffe000003134:	fffff737          	lui	a4,0xfffff
 ffffffe000003138:	00e4f4b3          	and	s1,s1,a4
 ffffffe00000313c:	02053603          	ld	a2,32(a0)
-ffffffe000003140:	00060863          	beqz	a2,ffffffe000003150 <do_page_fault+0x130>
+ffffffe000003140:	00060863          	beqz	a2,ffffffe000003150 <+0x130>
 ffffffe000003144:	00002717          	auipc	a4,0x2
 ffffffe000003148:	ec473703          	ld	a4,-316(a4) # ffffffe000005008 <USER_END>
-ffffffe00000314c:	0ae78e63          	beq	a5,a4,ffffffe000003208 <do_page_fault+0x1e8>
-ffffffe000003150:	0c059a63          	bnez	a1,ffffffe000003224 <do_page_fault+0x204>
+ffffffe00000314c:	0ae78e63          	beq	a5,a4,ffffffe000003208 <+0x1e8>
+ffffffe000003150:	0c059a63          	bnez	a1,ffffffe000003224 <+0x204>
 ffffffe000003154:	02842703          	lw	a4,40(s0)
 ffffffe000003158:	01076713          	ori	a4,a4,16
 ffffffe00000315c:	00048693          	mv	a3,s1
@@ -3331,21 +3331,21 @@ ffffffe0000031d8:	00008067          	ret
 ffffffe0000031dc:	00001517          	auipc	a0,0x1
 ffffffe0000031e0:	21450513          	addi	a0,a0,532 # ffffffe0000043f0 <kmem_cache_objsize+0x128>
 ffffffe0000031e4:	0ac000ef          	jal	ra,ffffffe000003290 <puts>
-ffffffe0000031e8:	fd9ff06f          	j	ffffffe0000031c0 <do_page_fault+0x1a0>
+ffffffe0000031e8:	fd9ff06f          	j	ffffffe0000031c0 <+0x1a0>
 ffffffe0000031ec:	03043703          	ld	a4,48(s0)
 ffffffe0000031f0:	00177713          	andi	a4,a4,1
-ffffffe0000031f4:	f20718e3          	bnez	a4,ffffffe000003124 <do_page_fault+0x104>
+ffffffe0000031f4:	f20718e3          	bnez	a4,ffffffe000003124 <+0x104>
 ffffffe0000031f8:	00001517          	auipc	a0,0x1
 ffffffe0000031fc:	1f850513          	addi	a0,a0,504 # ffffffe0000043f0 <kmem_cache_objsize+0x128>
 ffffffe000003200:	090000ef          	jal	ra,ffffffe000003290 <puts>
-ffffffe000003204:	fbdff06f          	j	ffffffe0000031c0 <do_page_fault+0x1a0>
+ffffffe000003204:	fbdff06f          	j	ffffffe0000031c0 <+0x1a0>
 ffffffe000003208:	0006091b          	sext.w	s2,a2
 ffffffe00000320c:	02842703          	lw	a4,40(s0)
 ffffffe000003210:	01076713          	ori	a4,a4,16
 ffffffe000003214:	00048693          	mv	a3,s1
 ffffffe000003218:	00053503          	ld	a0,0(a0)
 ffffffe00000321c:	828fe0ef          	jal	ra,ffffffe000001244 <create_mapping>
-ffffffe000003220:	f55ff06f          	j	ffffffe000003174 <do_page_fault+0x154>
+ffffffe000003220:	f55ff06f          	j	ffffffe000003174 <+0x154>
 ffffffe000003224:	00048513          	mv	a0,s1
 ffffffe000003228:	974ff0ef          	jal	ra,ffffffe00000239c <kmalloc>
 ffffffe00000322c:	00100613          	li	a2,1
@@ -3368,11 +3368,11 @@ ffffffe00000326c:	fffff537          	lui	a0,0xfffff
 ffffffe000003270:	00b575b3          	and	a1,a0,a1
 ffffffe000003274:	0007b503          	ld	a0,0(a5)
 ffffffe000003278:	fcdfd0ef          	jal	ra,ffffffe000001244 <create_mapping>
-ffffffe00000327c:	ef9ff06f          	j	ffffffe000003174 <do_page_fault+0x154>
+ffffffe00000327c:	ef9ff06f          	j	ffffffe000003174 <+0x154>
 ffffffe000003280:	00001517          	auipc	a0,0x1
 ffffffe000003284:	17050513          	addi	a0,a0,368 # ffffffe0000043f0 <kmem_cache_objsize+0x128>
 ffffffe000003288:	008000ef          	jal	ra,ffffffe000003290 <puts>
-ffffffe00000328c:	f35ff06f          	j	ffffffe0000031c0 <do_page_fault+0x1a0>
+ffffffe00000328c:	f35ff06f          	j	ffffffe0000031c0 <+0x1a0>
 
 ffffffe000003290 <puts>:
 ffffffe000003290:	00054783          	lbu	a5,0(a0)

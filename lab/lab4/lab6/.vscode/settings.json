@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "ios": "c",
+        "__threading_support": "c",
+        "chrono": "c",
+        "type_traits": "cpp"
+    }
+}
