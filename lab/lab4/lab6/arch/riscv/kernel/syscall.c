@@ -114,7 +114,7 @@ int mprotect (void *__addr, size_t __len, int __prot) {
                 break;
             }
         }
-    }`
+    }
     if (found == NULL) {
         return -1;
     }
