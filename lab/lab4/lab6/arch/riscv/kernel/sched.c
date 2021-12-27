@@ -23,8 +23,8 @@ extern void switch_context(struct thread_struct *, struct thread_struct *);
 extern void task_first_ret();
 
 void initial_pgtbl(unsigned long pgtbl) {
-    unsigned long text_start = kmem_struct.text_start, rodata_start = kmem_struct.rodata_start, data_start = kmem_struct.data_start;
-    unsigned long virtual_offset = kmem_struct.virtual_offset;
+    uintptr_t text_start = kmem_struct.text_start, rodata_start = kmem_struct.rodata_start, data_start = kmem_struct.data_start;
+    uintptr_t virtual_offset = kmem_struct.virtual_offset;
     create_mapping(pgtbl, virtual_offset + text_start, text_start, rodata_start - text_start, 5 << 1);
     create_mapping(pgtbl, virtual_offset + rodata_start, rodata_start, data_start - rodata_start, 1 << 1);
     create_mapping(pgtbl, virtual_offset + data_start, data_start, 0x1000000 - (data_start - text_start), 3 << 1);

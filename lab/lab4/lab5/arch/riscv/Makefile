@@ -1,11 +1,17 @@
+
+VMLINUX = ../../vmlinux
+INIT = ../../init
+LIB = ../../lib
+SYSTEMMAP = ../../System.map
+
 .PHONY : all
-all : ../../vmlinux boot/image ../../System.map
+all : ${VMLINUX} boot/image ${SYSTEMMAP}
 
-../../vmlinux : ../../init/main.o ../../init/test.o kernel/head.o kernel/entry.o kernel/strap.o ../../lib/put.o ../../lib/rand.o kernel/sched.o kernel/vm.o
-	$(LD) ../../init/main.o ../../init/test.o kernel/head.o kernel/entry.o kernel/strap.o kernel/sched.o kernel/vm.o ../../lib/put.o ../../lib/rand.o -T kernel/vmlinux.lds -o ../../vmlinux
+${VMLINUX} : ${INIT}/main.o ${INIT}/test.o kernel/head.o kernel/entry.o kernel/strap.o ${LIB}/put.o ${LIB}/rand.o kernel/sched.o kernel/vm.o
+	$(LD) ${INIT}/main.o ${INIT}/test.o kernel/head.o kernel/entry.o kernel/strap.o kernel/sched.o kernel/vm.o ${LIB}/put.o ${LIB}/rand.o -T kernel/vmlinux.lds -o ${VMLINUX}
 
-boot/image : ../../vmlinux
-	$(OBJCOPY) -O binary ../../vmlinux boot/Image --strip-all
+boot/image : ${VMLINUX}
+	$(OBJCOPY) -O binary ${VMLINUX} boot/Image --strip-all
 
-../../System.map : ../../vmlinux
-	nm ../../vmlinux > ../../System.map
+${SYSTEMMAP} : ${VMLINUX}
+	nm ${VMLINUX} > ${SYSTEMMAP}

@@ -1,8 +1,11 @@
+
+INCLUDEE =  ../include
+
 .PHONY : all
 all : main.o test.o
 
-main.o : main.c ../include/test.h
+main.o : main.c ${INCLUDEE}/test.h
 	$(GCC) $(CFLAG) main.c
 
-test.o : test.c ../include/test.h ../include/put.h
+test.o : test.c ${INCLUDEE}/test.h ${INCLUDEE}/put.h
 	$(GCC) $(CFLAG) test.c

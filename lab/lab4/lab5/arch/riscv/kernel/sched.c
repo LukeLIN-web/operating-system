@@ -33,7 +33,6 @@ void initial_kernel_stack(unsigned long sscratch_top, unsigned long sp) {
     __asm__ __volatile__("sd s1, 0(sp)\n\t");
     __asm__ __volatile__("sd s2, 8(sp)\n\t");
 
-    // __asm__ __volatile__("csrrw s1, sscratch, s1\n\t");
     __asm__ __volatile__("addi s1, %0, -280\n\t": : "r"(sscratch_top));
 
     __asm__ __volatile__("sd %0, 8(s1)\n\t" : : "r"(sp));
@@ -89,7 +88,6 @@ void task_init(void) {
         addr_top += 0x1000;
         initial_pgtbl(task[i]->thread.mm->pgtbl);
 
-
         #ifdef SJF
         puts("[ PID = ");
         puti(task[i]->pid);
@@ -112,7 +110,6 @@ void task_init(void) {
 }
 
 void do_timer(void) {
-    
     #ifdef SJF
     puts("[ PID = ");
     puti(current->pid);
@@ -299,9 +296,6 @@ void switch_to_asm(struct task_struct* next) {
     __asm__ __volatile__("csrr t0, sscratch\n\tadd %0, t0, x0\n\t"
 		:"=r"(current->thread.sscratch)
 		);
-    // __asm__ __volatile__("addi t0, t0, 1\n\tslli t0, t0, 44\n\taddi t0, t0, -1\n\tcsrr t1, satp\n\tand t1, t1, t0\n\tsll %0, t1, 12\n\t"
-	// 	:"=r"(current->thread.mm->pgtbl)
-	// 	);
     
     __asm__ __volatile__("add ra, %0 ,x0\n\t"
 		: :"r"(next->thread.ra)

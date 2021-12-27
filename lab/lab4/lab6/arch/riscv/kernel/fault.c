@@ -51,7 +51,8 @@ void do_page_fault() {
         return;
     }
     //匹配到合法的`vma_area`后，才可进行相应的物理内存分配以及页表的映射。
-    unsigned pa;
+    //注意需要特判fork⼦进程的栈⻚和进程的代码段，这时不需要⽤kmalloc来获取物理⻚，前者通过映射到已复制的⼦进程物理⻚，后者映射到0x84000000
+    unsigned long pa;
     unsigned long sz = (found->vm_end - found->vm_start + PAGE_SIZE - 1) / PAGE_SIZE * PAGE_SIZE;
     if (current->thread.mm->pa_for_stack != 0 && found->vm_end == USER_END) {
         pa = current->thread.mm->pa_for_stack;

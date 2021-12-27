@@ -14,7 +14,6 @@ void create_table_dir(unsigned long *tblptr, unsigned long va, unsigned long pa,
     // puts("pa: "); puti(pa); puts("\n");
     // puts("tblptr: "); puti(tblptr); puts("\n");
     // puts("tblptr[tbl_index]: "); puti(tblptr[tbl_index]); puts("\n");
-
     
     if ((tblptr[tbl_index]) & 1) {
         if (((tblptr[tbl_index] >> 1) & 0x7) == 0) {
@@ -39,8 +38,8 @@ void create_table_dir(unsigned long *tblptr, unsigned long va, unsigned long pa,
 void create_mapping(unsigned long *pgtbl, unsigned long va, unsigned long pa, unsigned long sz, int perm) {
     // puts("va: "); puti(va); puts("\n");
     unsigned long i = 0;
-    unsigned long va_aligned = va;// >> 12) << 12;
-    unsigned long pa_aligned = pa;// >> 12) << 12;
+    unsigned long va_aligned = va;    
+    unsigned long pa_aligned = pa;
     for (i = 0; i < sz; i += 0x1000) {
         // puts("va + i: "); puti(va + i); puts("\n");
         // puts("pa + i: "); puti(pa + i); puts("\n");

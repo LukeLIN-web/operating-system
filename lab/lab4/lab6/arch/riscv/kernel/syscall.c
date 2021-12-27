@@ -19,7 +19,7 @@ unsigned long get_unmapped_area(size_t length) {
     unsigned long i = 0;
     for (i = 0; ; ++i) {
         struct vm_area_struct *ptr;
-        int flag = 0;
+        char flag = 0;
         for (ptr = current->thread.mm->vm_area_head; ptr != NULL; ptr = ptr->vm_next) {
             if (ptr->vm_start < i + length && ptr->vm_end > i) {
                 flag = 1;
@@ -42,6 +42,7 @@ void *do_mmap(struct mm_struct *mm, void *start, size_t length, int prot) {
             break;
         }
     }
+
     //配合需求分页机制，需要创建一个`vm_area_struct`记录该虚拟地址区域的信息，并添加到`mm`的链表中
     struct vm_area_struct *new_vm_area = kmalloc(sizeof(struct vm_area_struct));
     new_vm_area->vm_start = (unsigned long)start;
@@ -65,6 +66,7 @@ void *mmap (void *__addr, size_t __len, int __prot,
             int __flags, int __fd, __off_t __offset) {
     return do_mmap(current->thread.mm, __addr, __len, __prot);
 }
+
 //是 `mmap`函数的逆操作，用于解除 `mmap`映射的虚拟地址区域：
 int munmap(void *start, size_t length) {
     struct vm_area_struct *found = NULL;
@@ -101,6 +103,7 @@ int munmap(void *start, size_t length) {
     kfree(found);
     return 0;
 }
+
 //修改一段指定内存区域（从 `void *__addr`开始, 长度为 `size_t __len`字节）的内存保护属性值 `int __prot`
 int mprotect (void *__addr, size_t __len, int __prot) {
     struct vm_area_struct *found = NULL;
@@ -144,6 +147,7 @@ int fork() {
     #ifdef PRIORITY
     task[task_num_top]->counter = 8 - task_num_top;
     #endif
+
     task[task_num_top]->priority = 5;
     task[task_num_top]->blocked = 0;
     task[task_num_top]->pid = task_num_top;
@@ -157,16 +161,15 @@ int fork() {
     puti(task[task_num_top]->counter);
     puts("\n");
 
-    // initial_kernel_stack(sscratch_top, sscratch_top - 280);
     task[task_num_top]->thread.sepc = current->thread.sepc;
     task[task_num_top]->thread.ra = (unsigned long)forkret;
     task[task_num_top]->thread.sscratch = sscratch_top;
     task[task_num_top]->thread.sp = sscratch_top - 280;
     task[task_num_top]->thread.mm = kmalloc(sizeof(struct mm_struct));
-    task[task_num_top]->thread.mm->pgtbl = (unsigned long)kmalloc(PAGE_SIZE) - page_offset + 0x80000000ul;
+    task[task_num_top]->thread.mm->pgtbl = (uint64)kmalloc(PAGE_SIZE) - page_offset + 0x80000000ul;
     task[task_num_top]->thread.mm->vm_area_head = NULL;
     task[task_num_top]->thread.mm->pa_for_stack = 0;
-    unsigned long pgtbl_va = (unsigned long)task[task_num_top]->thread.mm->pgtbl;
+    uint64 pgtbl_va = (uint64)task[task_num_top]->thread.mm->pgtbl;
     initial_pgtbl(pgtbl_va);
     //子进程需要拷贝父进程 `task_struct`、`根页表`、`mm_struct`以及父进程的 `用户栈`等信息。
 
@@ -197,7 +200,7 @@ int fork() {
     }
     task[task_num_top]->thread.stack[9] = 0;
     char *new_stack = kmalloc(PAGE_SIZE);
-    task[task_num_top]->thread.mm->pa_for_stack = (unsigned long)new_stack - page_offset + 0x80000000ul;
+    task[task_num_top]->thread.mm->pa_for_stack = (uint64)new_stack - page_offset + 0x80000000ul;
     for (int i = 0; i < PAGE_SIZE; ++i) {
         new_stack[i] = ((char*)(USER_END - PAGE_SIZE))[i];
     }
