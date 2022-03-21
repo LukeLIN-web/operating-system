@@ -444,8 +444,6 @@ void *alloc_pages(int n) {
 }  
 ```
 
-
-
 ##### free_pages：理解下图，并完成free_pages接口
 
 ```c

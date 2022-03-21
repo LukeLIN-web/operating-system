@@ -3,12 +3,12 @@
 
 
  lab5/6 有意向的同学可以尝试着做一下，相关事项如下：
-\1. lab5/lab6要求单人完成，原则上不设过程分，请在完成基本功能后再提交，截止日期2021年12月20日23：00。
-\2. lab5/lab6需要提交实验代码+提交实验报告+完成验收，每个bonus的满分是总评成绩中的6分，但不会超过平时分50分的上限。
+\1. lab5/lab6要求单人完成
+\2. lab5/lab6需要提交实验代码+提交实验报告+完成验收
 \3. lab5/lab6建立在lab4上，只提供额外的代码。实验文档是上一届的，没有做修改，可能有一定的阅读难度，在github上提供了上一届risc-v版本的其他文档（/lab20fall-stu）。
 \4. lab5/lab6助教不提供答疑。
 
-# Lab 5: RISC-V 64 用户模式
+Lab 5: RISC-V 64 用户模式
 
 ## 1 实验目的
 
@@ -66,11 +66,11 @@ lab5
 │       │   └── vmlinux.lds
 │       └── Makefile
 ├── include
-│   └── ...
+│   └── 各个头文件
 ├── init
-│   └── ...
+│   └──main.c,test.c
 ├── lib
-│   └── ...
+│   └── put.c  rand.c
 └── Makefile
 ```
 
@@ -137,7 +137,7 @@ RISCV = arch/riscv/
 INIT = init/
 KERNEL = arch/riscv/kernel/
 LIB = lib/
-# 不管有没有最新的这些文件， 都会执行下面这些命令。 
+# .PHONY保证不管有没有最新的这些文件， 都会执行下面这些命令。 
 .PHONY : all ${LIB} ${INIT} ${KERNEL} ${RISCV} 
 all : ${LIB} ${INIT} ${KERNEL} ${RISCV}
 
@@ -169,9 +169,10 @@ clean :
 
 ### 5.2 添加系统调用处理函数
 
-本实验我们将增加对系统调用的处理。在RISC-V中系统调用通过 `ecall`（environment call）来实现。在U-mode、S-mode、M-mode下执行 `ecall`分别会触发environment-call-from-U-mode异常、environment-call-from-S-mode异常、environment-call-from-M-mode异常。在系统调用的实现中，我们通过在U-mode下执行 `ecall`触发environment-call-from-U-mode异常，并由S-mode中运行的内核处理这个异常。
+本实验我们将增加对系统调用的处理。在RISC-V中系统调用通过 `ecall`（environment call）来实现。在U-mode、S-mode、M-mode下执行 `ecall`分别会触发environment-call-from-U-mode异常、environment-call-from-S-mode异常、environment-call-from-M-mode异常。在系统调用的实现中，我们通过在用户模式U-mode下执行 `ecall`触发environment-call-from-U-mode异常，并由特权模式S-mode中运行的内核处理这个异常。
 
 在head.S中内核boot阶段时，设置 medeleg 寄存器为用户模式系统调用添加异常委托。
+
 在没有设置异常委托的情况下，`ecall`指令产生的异常由M-mode来处理，而不是交由内核所在的S-mode进行处理。通过 medeleg 中设置相应的位，可以将environment-call-from-U-mode异常直接交由S-mode处理。具体设置方式参照RISC-V手册。
 
 为了便于确认实验完成的正确与否，本实验对异常处理函数的命名和类型有要求，要求其函数原型如下：
@@ -501,8 +502,6 @@ ZJU OS LAB 5             STUDEDNT-ID/GROUP-ID
   * 对实验指导的建议（可选）
 - 工程文件
   * 所有source code（执行过make clean的工程，不需要提交中间及结果文件）
-  * 将lab5_319010XXXX目录压缩成zip格式
-- 将报告和工程压缩包提交至学在浙大
 
 ```
 lab5_319010XXXX
@@ -517,7 +516,7 @@ lab5_319010XXXX
 └── Makefile
 ```
 
-心得体会：
+### 心得体会
 
  本次实验在之前线程调度的基础上增加了虚拟地址，使得之前实验的很多疑问都得到了解决。比如在task_struct中增加几位数据可以解决许多之前实验只能放在栈中保存的数据。 学习了很多写makefile 的范式，  进一步学习了 进程的数据结构， 里面还包含页表地址， 保存寄存器， 还有虚拟内存映射的 地址空间分配情况。  学习了怎么跳转到用户态， 对用户态的栈切换。 基本思想就是保存寄存器 ， 跳转回去。 
 
